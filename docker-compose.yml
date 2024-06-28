@@ -1,0 +1,54 @@
+services:
+  service1:
+    build:
+      context: ./service1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.service1.rule=Host(`localhost`) && PathPrefix(`/service1`)"
+      - "traefik.http.routers.service1.service=service1"
+      - "traefik.http.services.service1.loadbalancer.server.port=8081"
+    networks:
+      - web
+
+  service2:
+    build:
+      context: ./service2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.service2.rule=Host(`localhost`) && PathPrefix(`/service2`)"
+      - "traefik.http.routers.service2.service=service2"
+      - "traefik.http.services.service2.loadbalancer.server.port=8082"
+    networks:
+      - web
+
+  service3:
+    build:
+      context: ./service3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.service3.rule=Host(`localhost`) && PathPrefix(`/service3`)"
+      - "traefik.http.routers.service3.service=service3"
+      - "traefik.http.services.service3.loadbalancer.server.port=8083"
+    networks:
+      - web
+
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+    ports:
+      - "80:80"
+      - "8080:8080" # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
+    networks:
+      - web
+
+networks:
+  web:

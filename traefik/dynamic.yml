@@ -1,0 +1,47 @@
+http:
+  routers:
+    service1:
+      rule: "Host(`localhost`) && PathPrefix(`/service1`)"
+      service: service1
+      middlewares:
+        - stripPrefix-service1
+
+    service2:
+      rule: "Host(`localhost`) && PathPrefix(`/service2`)"
+      service: service2
+      middlewares:
+        - stripPrefix-service2
+
+    service3:
+      rule: "Host(`localhost`) && PathPrefix(`/service3`)"
+      service: service3
+      middlewares:
+        - stripPrefix-service3
+
+  services:
+    service1:
+      loadBalancer:
+        servers:
+          - url: "http://service1:8081"
+    service2:
+      loadBalancer:
+        servers:
+          - url: "http://service2:8082"
+    service3:
+      loadBalancer:
+        servers:
+          - url: "http://service3:8083"
+
+  middlewares:
+    stripPrefix-service1:
+      stripPrefix:
+        prefixes:
+          - "/service1"
+    stripPrefix-service2:
+      stripPrefix:
+        prefixes:
+          - "/service2"
+    stripPrefix-service3:
+      stripPrefix:
+        prefixes:
+          - "/service3"
